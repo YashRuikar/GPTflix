@@ -7,14 +7,14 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { USER_AVATAR } from "../utils/constants";
+import { BACKGROUND_IMAGE } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const email = useRef(null);
@@ -48,8 +48,7 @@ const Login = () => {
           const user = userCredential.user;
           updateProfile(user, {
             displayName: name.current.value,
-            photoURL:
-              "https://avatars.githubusercontent.com/u/86367463?s=400&u=cb93278b6c5d937eeb10a9ed1b1c973b15a19698&v=4",
+            photoURL: USER_AVATAR,
           })
             .then(() => {
               const { uid, email, displayName, photoURL } = auth.currentUser;
@@ -61,7 +60,6 @@ const Login = () => {
                   photoURL: photoURL,
                 })
               );
-              navigate("/browse");
             })
             .catch((error) => {
               setErrorMessage(error.message);
@@ -82,8 +80,6 @@ const Login = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          console.log(user);
-          navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -97,14 +93,17 @@ const Login = () => {
     setIsSignInForm(!isSignInForm);
   };
 
+  const handleDemoLogin = () => {
+    email.current.value = 'demo@example.com';
+    password.current.value = 'Password123@';
+    handleButtonClick()
+  };
+
   return (
     <div>
       <Header />
       <div className="absolute">
-        <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/fc164b4b-f085-44ee-bb7f-ec7df8539eff/d23a1608-7d90-4da1-93d6-bae2fe60a69b/IN-en-20230814-popsignuptwoweeks-perspective_alpha_website_large.jpg"
-          alt="logo"
-        />
+        <img src={BACKGROUND_IMAGE} alt="logo" />
       </div>
       <form
         onSubmit={(e) => e.preventDefault()}
@@ -139,6 +138,9 @@ const Login = () => {
           onClick={handleButtonClick}
         >
           {isSignInForm ? "Sign In" : "Sign Up"}
+        </button>
+        <button className="p-2 my-2 bg-[#333333] w-full rounded-md" onClick={handleDemoLogin}>
+          Use Demo Email and Password
         </button>
         <p className="py-4 text-[#737373]">
           {isSignInForm ? "New to GPTflix? " : "Already Registered? "}
